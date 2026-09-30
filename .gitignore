@@ -1,0 +1,11 @@
+# Python System files
+__pycache__/
+*.pyc
+
+# Excel / CSV Data files (Security အတွက် ဖျောက်ထားမည်)
+*.xlsx
+*.csv
+
+# Screenshot Image files
+*.png
+*.jpg
