@@ -8,14 +8,14 @@ url = "https://books.toscrape.com/"
 print("ဝဘ်ဆိုက်သို့ ဆက်သွယ်နေပါသည်...")
 response = requests.get(url)
 
+# Unicode Character (Â£ ပြဿနာ) ရှင်းရန် Encoding သတ်မှတ်ခြင်း
+response.encoding = 'utf-8'
+
 if response.status_code == 200:
     print("ဝဘ်ဆိုက်မှ အချက်အလက်များ ဖတ်ယူ၍ ရရှိပါပြီ။\n")
     soup = BeautifulSoup(response.text, "html.parser")
     
-    # စာအုပ်တစ်အုပ်စီ၏ အချက်အလက် သိမ်းဆည်းရန် List
     books_data = []
-    
-    # Books to Scrape တွင် စာအုပ်တစ်အုပ်စီကို <article class="product_pod"> ထဲတွင် ထည့်ထားပါသည်
     product_pods = soup.find_all("article", class_="product_pod")
     
     for pod in product_pods:
@@ -23,20 +23,20 @@ if response.status_code == 200:
         title_tag = pod.find("h3").find("a")
         title = title_tag["title"] if "title" in title_tag.attrs else title_tag.text.strip()
         
-        # ဈေးနှုန်း (Price) ယူခြင်း (p class="price_color" ထဲတွင် ရှိပါသည်)
+        # ဈေးနှုန်း (Price) ယူခြင်း
         price_tag = pod.find("p", class_="price_color")
         price = price_tag.text.strip() if price_tag else "N/A"
         
-        # Dictionary အဖြစ် သိမ်းဆည်းခြင်း
+        # Â စာလုံးအပို ပါလာပါက ရှင်းထုတ်ခြင်း (Double Clean)
+        price = price.replace("Â", "")
+        
         books_data.append({
             "စာအုပ်အမည်": title,
             "ဈေးနှုန်း": price
         })
     
-    # ၂။ Data Frame အဖြစ် ပြောင်းလဲခြင်း
+    # Data Frame အဖြစ် ပြောင်းလဲပြီး Excel သို့ သိမ်းဆည်းခြင်း
     df = pd.DataFrame(books_data)
-    
-    # ၃။ Excel ဖိုင်အဖြစ် အလိုအလျောက် သိမ်းဆည်းခြင်း
     excel_filename = "books_list.xlsx"
     df.to_excel(excel_filename, index=False)
     
